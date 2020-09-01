@@ -5,12 +5,7 @@ pipeline {
     }   
         
           stages {
-        stage('Hello') {
-            steps {
-                echo 'Hello World'
-                
-            }
-        }
+       
         stage('build') {
             steps {
                 echo 'Hello build'
@@ -20,20 +15,22 @@ pipeline {
             }
         }
         
-       stage('deploy') {
+       stage('test') {
             steps {
-                echo 'Hello deploy'
+                sh 'mvn test'
                 
             }
         }
-        
-        stage('test') {
-            steps {
-                echo 'Hello test'
-                
-            }
-        }
-        
+        stage ('build and publish image') {
+     steps {  
+      scripts { 
+       checkout scm
+       docker.WithRegistry('', 'dockerUserID') {   
+       def customImage = docker.build("bertinlekane/holiday-pipeline:${env.BUILD_ID}")
+       customImage.push()
+
+    customImage.push('latest')
+              
     }
 }
 
